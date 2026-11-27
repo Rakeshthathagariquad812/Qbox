@@ -18,6 +18,7 @@ import 'package:qbox_app/services/app_services.dart';
 import 'package:qbox_app/services/auth_api.dart';
 import 'package:qbox_app/services/device_actions.dart';
 import 'package:qbox_app/services/language_api.dart';
+import 'package:qbox_app/services/push_notifications.dart';
 import 'package:qbox_app/services/session_store.dart';
 import 'package:qbox_app/services/settings_store.dart';
 import 'package:qbox_app/stock/stock_api.dart';
@@ -251,9 +252,23 @@ class FakeVoiceInput implements VoiceInput {
 }
 
 /// Pretend speaker: remembers what it was asked to say, and in which voice.
-class FakeSpeaker implements Speaker {
+class FakeSpeaker implements Speaker, VoiceChoices {
   final List<String> said = [];
   final List<String> locales = [];
+
+  /// The pretend phone's voices for every language, and the voice each line used.
+  List<String> phoneVoices = const ['x-local-a', 'x-network-b'];
+  final List<String?> voicesUsed = [];
+
+  @override
+  Future<List<String>> voices(String locale) async => phoneVoices;
+
+  @override
+  Future<void> sayWith(String text, {required String locale, required String voice}) async {
+    said.add(text);
+    locales.add(locale);
+    voicesUsed.add(voice);
+  }
 
   /// Voices this pretend phone does NOT have.
   final Set<String> missingVoices = {};
@@ -262,6 +277,7 @@ class FakeSpeaker implements Speaker {
   Future<void> say(String text, {String locale = 'en-IN'}) async {
     said.add(text);
     locales.add(locale);
+    voicesUsed.add(null);
   }
 
   @override
@@ -303,6 +319,7 @@ AppServices fakeServices({
   NoticesApi? notices,
   SupplyApi? supply,
   SupplyStore? supplyStore,
+  PushNotifications? push,
 }) {
   final profileApi = profile ?? FakeProfileApi();
   final calendarCopy = calendarStore ?? MemoryCalendarStore();
@@ -337,6 +354,7 @@ AppServices fakeServices({
     photoPicker: photoPicker ?? FakePhotoPicker(),
     notices: notices ?? FakeNoticesApi(),
     supply: SupplyRepository(supply ?? FakeSupplyApi(), supplyStore ?? MemorySupplyStore()),
+    push: push,
   );
 }
 

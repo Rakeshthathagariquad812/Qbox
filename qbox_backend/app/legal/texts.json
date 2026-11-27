@@ -27,7 +27,7 @@
      "Ask QBOX: your question is answered on your phone from your own records. If it is not understood in an Indian language, the words go to the QBOX server to be translated, and are not kept.",
      "Camera and gallery: to scan a QR, or to choose your photo.",
      "Contacts: only the one person you pick. Your contact list is not read or uploaded.",
-     "Notifications: for reminders you set.",
+     "Notifications: for reminders you set, and for news in your bell (payments, udhaar, orders). Switch kinds off in the bell, or all of them in your phone settings.",
      "QBOX does not use your location, and shows no advertisements."
     ]
    ],
@@ -54,7 +54,8 @@
     "Companies that help us",
     [
      "Razorpay (online payments), an SMS company (codes), and the company that hosts our server. They get only what their work needs.",
-     "Google Firebase (crash reports): if the app crashes, a short technical report goes to us: where in the app it broke, the phone model, Android version and app version. It has no PIN, names, numbers or records."
+     "Google Firebase (crash reports): if the app crashes, a short technical report goes to us: where in the app it broke, the phone model, Android version and app version. It has no PIN, names, numbers or records.",
+     "Google Firebase (notifications): to bring your bell news to your phone. Firebase gets a code for your phone and the words of each notification (for example who paid and how much), only to deliver it."
     ]
    ],
    [

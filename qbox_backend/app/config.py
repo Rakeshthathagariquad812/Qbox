@@ -79,6 +79,11 @@ class Settings(BaseSettings):
     def razorpay_test_account_on(self) -> bool:
         return bool(self.razorpay_key_id and self.razorpay_key_secret) and not self.is_production
 
+    # Push notifications (Firebase Cloud Messaging): the path of the Firebase server key
+    # file (Firebase console, Project settings, Service accounts). Empty = switched off.
+    # It is a secret: never upload it.
+    firebase_key_file: str = ""
+
     # Shown in Help and on the privacy page. Set them before going live (the privacy
     # policy needs a way to complain).
     support_name: str = ""

@@ -5,6 +5,9 @@
 *.keystore
 key.properties
 local.properties
+# Firebase server key (push notifications) and app config
+*firebase-adminsdk*.json
+google-services.json
 
 # Build output and clutter
 **/android/build/

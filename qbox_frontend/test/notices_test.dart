@@ -142,7 +142,7 @@ void main() {
   testWidgets('choosing notifications; put back when it could not be saved', (tester) async {
     await open(tester, NoticesScreen(role: QboxRole.customer, now: now));
     await tapKey(tester, 'notices-settings');
-    expect(find.byType(SwitchListTile), findsNWidgets(3));
+    expect(find.byWidgetPredicate((w) => w is SwitchListTile && '${w.key}'.contains('notice-type-')), findsNWidgets(3));
     await tapKey(tester, 'notice-type-BUDGET');
     expect(api.off[QboxRole.customer], {NoticeType.budget});
     api.offline = true;
@@ -185,6 +185,6 @@ void main() {
     await tapKey(tester, 'home-bell');
     expect(at('notices-empty'), findsOneWidget);
     await tapKey(tester, 'notices-settings');
-    expect(find.byType(SwitchListTile), findsNWidgets(3));
+    expect(find.byWidgetPredicate((w) => w is SwitchListTile && '${w.key}'.contains('notice-type-')), findsNWidgets(3));
   });
 }

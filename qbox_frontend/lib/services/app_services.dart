@@ -29,6 +29,7 @@ import 'api_config.dart';
 import 'auth_api.dart';
 import 'device_actions.dart';
 import 'language_api.dart';
+import 'push_notifications.dart';
 import 'session_store.dart';
 import 'settings_store.dart';
 
@@ -59,7 +60,8 @@ class AppServices {
     required this.photoPicker,
     required this.notices,
     required this.supply,
-  });
+    PushNotifications? push,
+  }) : push = push ?? NoPushNotifications(settings);
 
   /// The real backend, on-phone storage, microphone, speaker and notifications.
   factory AppServices.live() {
@@ -101,6 +103,7 @@ class AppServices {
       photoPicker: PhonePhotoPicker(),
       notices: HttpNoticesApi(api),
       supply: SupplyRepository(HttpSupplyApi(api), SecureSupplyStore()),
+      push: FirebasePushNotifications(api, settings),
     );
   }
 
@@ -153,6 +156,9 @@ class AppServices {
   /// The supplier's shops, their accounts and orders.
   final SupplyRepository supply;
 
+  /// The bell on the phone, even with QBOX closed.
+  final PushNotifications push;
+
   /// Changes made offline that the server does not have yet.
   Future<int> unsentCount() async =>
       await udhaar.pendingCount() +
@@ -164,6 +170,7 @@ class AppServices {
 
   /// Forgets everything this user kept on the phone (log out, expired login).
   Future<void> forgetUserData() async {
+    await push.stop(); // first: it still needs the login to tell the server
     await session.clear();
     await calculator.clear();
     await calendarStore.clear();

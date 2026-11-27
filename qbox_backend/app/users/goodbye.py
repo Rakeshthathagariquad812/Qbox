@@ -1,7 +1,7 @@
 """Deleting one's own account.
 
 - Everything private goes: details, photos, PIN, calendar, notes, expenses, stock,
-  products, UPI IDs and payment keys, the bell, codes.
+  products, UPI IDs and payment keys, the bell, push notifications, codes.
 - What is also someone else's record stays, without the private details: a shop's
   udhaar lines (the customer can still see what they owe or paid), payments, and
   what a shop and a supplier shared.
@@ -45,6 +45,7 @@ from app.models import (
     User,
     UserRole,
 )
+from app.push import service as push
 from app.suppliers import service as suppliers
 from app.supply import links
 from app.supply import service as supply
@@ -88,6 +89,7 @@ def delete_account(db: Session, user: User, pin: str) -> None:
     ):
         db.execute(delete(table).where(column == me))
     db.execute(delete(OtpCode).where(or_(OtpCode.mobile == mobile, OtpCode.requested_by == me)))
+    push.forget_all(db, me)
 
     # A shop's book: only lines its customers can still look at.
     db.execute(delete(UdhaarCustomer).where(

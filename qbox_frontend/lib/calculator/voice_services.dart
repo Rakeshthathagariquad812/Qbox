@@ -96,6 +96,15 @@ abstract class SpeakerDone {
   Future<void> get finished;
 }
 
+/// A speaker with more than one voice (alerts can use a chosen one).
+abstract class VoiceChoices {
+  /// The phone's voices for [locale] ('te-IN'), by name; those that work offline first.
+  Future<List<String>> voices(String locale);
+
+  /// Says [text] in [voice] (a name from [voices]); the usual voice if it is gone.
+  Future<void> sayWith(String text, {required String locale, required String voice});
+}
+
 /// Uses the phone's own speech recognition (Google on Android), in Indian English.
 class DeviceVoiceInput implements VoiceInput, VoiceGuesses {
   DeviceVoiceInput({SpeechToText? speech}) : _speech = speech ?? SpeechToText();
@@ -303,7 +312,7 @@ class DeviceVoiceInput implements VoiceInput, VoiceGuesses {
 }
 
 /// Uses the phone's text-to-speech voices (Indian English by default).
-class DeviceSpeaker implements Speaker, SpeakerDone {
+class DeviceSpeaker implements Speaker, SpeakerDone, VoiceChoices {
   final FlutterTts _tts = FlutterTts();
   String? _locale;
   bool _handlers = false;
@@ -360,6 +369,55 @@ class DeviceSpeaker implements Speaker, SpeakerDone {
     } catch (_) {
       _quiet();
       // Speaking is a bonus: never let it break the screen.
+    }
+  }
+
+  @override
+  Future<List<String>> voices(String locale) async {
+    await _useBestVoices();
+    String norm(Object? l) => '$l'.toLowerCase().replaceAll('_', '-');
+    try {
+      final all = await _tts.getVoices;
+      if (all is! List) return const [];
+      final names = <String>[
+        for (final v in all)
+          if (v is Map && norm(v['locale']) == norm(locale) && v['name'] is String) v['name'] as String,
+      ];
+      // Offline voices first; then by name, so the list stays in the same order.
+      names.sort((a, b) {
+        final online = a.contains('network').toString().compareTo(b.contains('network').toString());
+        return online != 0 ? online : a.compareTo(b);
+      });
+      return names.toSet().toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  @override
+  Future<void> sayWith(String text, {required String locale, required String voice}) async {
+    await _useBestVoices();
+    try {
+      await _tts.setLanguage(locale);
+      await _tts.setSpeechRate(0.45);
+      await _tts.setVoice({'name': voice, 'locale': locale});
+    } catch (_) {
+      // The usual voice, then.
+    }
+    _locale = null; // the next say() sets its own language (and the usual voice) again
+    if (!_handlers) {
+      _tts.setCompletionHandler(_quiet);
+      _tts.setErrorHandler(_quiet);
+      _handlers = true;
+    }
+    try {
+      await _tts.stop();
+      _quiet();
+      _talking = Completer<void>();
+      final language = AppLanguage.values.firstWhere((l) => l.voiceLocale == locale, orElse: () => AppLanguage.english);
+      await _tts.speak(sayable(text, language));
+    } catch (_) {
+      _quiet();
     }
   }
 

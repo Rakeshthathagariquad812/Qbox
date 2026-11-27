@@ -7,7 +7,9 @@ import 'widgets/qbox_brand.dart';
 import 'customer_home_screen.dart';
 import 'onboarding_draft.dart';
 import 'profile/log_out.dart';
+import 'profile/notices_screen.dart';
 import 'services/app_services.dart';
+import 'services/push_notifications.dart';
 import 'shop_home_screen.dart';
 import 'supplier_home_screen.dart';
 import 'widgets/qbox_wave.dart';
@@ -25,16 +27,46 @@ class ChooseRoleScreen extends StatefulWidget {
 
 class _ChooseRoleScreenState extends State<ChooseRoleScreen> {
   bool _reminded = false;
+  PushNotifications? _push;
 
-  /// Just logged in, or QBOX was opened: calendar reminders are set again.
+  /// Just logged in, or QBOX was opened: calendar reminders are set again, and
+  /// this phone gets push notifications.
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (_reminded) return;
     _reminded = true;
     final services = context.getInheritedWidgetOfExactType<ServicesScope>()?.services;
-    if (services != null) unawaited(services.calendar.remindAgain(OnboardingScope.of(context).orderedRoles()));
+    if (services == null) return;
+    unawaited(services.calendar.remindAgain(OnboardingScope.of(context).orderedRoles()));
+    _push = services.push..opened.addListener(_openBell);
+    unawaited(services.push.start());
+    WidgetsBinding.instance.addPostFrameCallback((_) => _openBell());
   }
+
+  @override
+  void dispose() {
+    _push?.opened.removeListener(_openBell);
+    super.dispose();
+  }
+
+  /// A push notification was tapped: that role's home, then its bell.
+  void _openBell() {
+    final role = _push?.opened.value;
+    if (role == null || !mounted) return;
+    if (!OnboardingScope.of(context).orderedRoles().contains(role)) return;
+    final navigator = Navigator.of(context);
+    navigator.popUntil((route) => route.isFirst);
+    unawaited(navigator.push(signupRoute(_home(role))));
+    unawaited(navigator.push(MaterialPageRoute<void>(builder: (_) => NoticesScreen(role: role))));
+    _push?.handled();
+  }
+
+  static Widget _home(QboxRole role) => switch (role) {
+    QboxRole.business => const ShopHomeScreen(),
+    QboxRole.customer => const CustomerHomeScreen(),
+    QboxRole.supplier => const SupplierHomeScreen(),
+  };
 
   @override
   Widget build(BuildContext context) {

@@ -4,6 +4,7 @@ import 'package:timezone/timezone.dart' as tz;
 
 import '../models/qbox_user.dart';
 import '../onboarding_draft.dart';
+import '../services/notification_taps.dart';
 import 'calendar_models.dart';
 
 /// Phone notifications for calendar reminders. They are set on the phone
@@ -98,6 +99,7 @@ class LocalReminderScheduler implements ReminderScheduler {
         settings: const InitializationSettings(
           android: AndroidInitializationSettings('@mipmap/ic_launcher'),
         ),
+        onDidReceiveNotificationResponse: onLocalNotificationTap,
       );
       _ready = true;
     } catch (_) {

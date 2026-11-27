@@ -774,6 +774,36 @@ class NoticeRead(Base):
     read_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
+class PushDevice(Base):
+    """A phone that gets push notifications for this user (Firebase Cloud Messaging).
+    Made with the login that was valid then: after "log out from all phones" or a PIN
+    reset it gets nothing more."""
+
+    __tablename__ = "push_devices"
+
+    token: Mapped[str] = mapped_column(String(400), primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    token_version: Mapped[int] = mapped_column(Integer)
+    # "Speak aloud" on this phone: the kinds of bell news said aloud, as "ROLE:TYPE"
+    # ("BUSINESS:PAYMENT"). Those alerts come as data the app shows and speaks.
+    speak: Mapped[list] = mapped_column(JSONB, default=list, server_default="[]")
+    # Quiet hours on this phone, in minutes after midnight (Indian time); none = never quiet.
+    quiet_from: Mapped[int | None] = mapped_column(Integer)
+    quiet_to: Mapped[int | None] = mapped_column(Integer)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class NoticePush(Base):
+    """One thing in the bell that was sent to the phones, so it is sent only once."""
+
+    __tablename__ = "notice_pushes"
+
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
+    role: Mapped[str] = mapped_column(String(20), primary_key=True)
+    notice: Mapped[str] = mapped_column(String(60), primary_key=True)
+    at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
 class PageKind(str, enum.Enum):
     LIST = "LIST"  # a checklist
     NOTE = "NOTE"

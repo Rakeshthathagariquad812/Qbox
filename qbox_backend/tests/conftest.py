@@ -16,6 +16,8 @@ for _limit in ("REQUESTS_PER_IP", "WRONG_PER_IP", "CODES_PER_IP", "REQUESTS_PER_
 # payment tests use a pretend Razorpay.
 os.environ["QBOX_RAZORPAY_KEY_ID"] = ""
 os.environ["QBOX_RAZORPAY_KEY_SECRET"] = ""
+# ...and never send real push notifications (push tests use a pretend sender).
+os.environ["QBOX_FIREBASE_KEY_FILE"] = ""
 
 import pytest  # noqa: E402
 from alembic import command  # noqa: E402

@@ -377,4 +377,18 @@ String receivedWords(int paise, AppLanguage language, {String? from}) {
   };
 }
 
+/// "Ravi says they paid ₹250" said out loud: a UPI payment not checked yet, so it
+/// must never sound like the money came.
+String saysPaidWords(int paise, AppLanguage language, {required String from}) {
+  final amount = rupees(paise).replaceAll('₹', '').replaceAll(',', '');
+  final name = from.trim().isEmpty ? null : from.trim();
+  return switch (language) {
+    AppLanguage.telugu => '${name ?? 'ఒకరు'} $amount రూపాయలు కట్టినట్టు చెప్పారు. చెక్ చేయండి',
+    AppLanguage.hindi => '${name == null ? 'किसी ने' : '$name ने'} कहा कि $amount रुपये भेजे हैं. जाँच लीजिए',
+    AppLanguage.kannada => '${name ?? 'ಒಬ್ಬರು'} $amount ರೂಪಾಯಿ ಕಳುಹಿಸಿದ್ದೇವೆ ಎಂದು ಹೇಳಿದ್ದಾರೆ. ಪರಿಶೀಲಿಸಿ',
+    AppLanguage.tamil => '${name ?? 'ஒருவர்'} $amount ரூபாய் அனுப்பியதாகச் சொல்கிறார். சரிபார்க்கவும்',
+    AppLanguage.english => '${name ?? 'Someone'} says they paid $amount rupees. Please check',
+  };
+}
+
 DateTime? _time(Object? v) => v is String ? DateTime.tryParse(v)?.toLocal() : null;

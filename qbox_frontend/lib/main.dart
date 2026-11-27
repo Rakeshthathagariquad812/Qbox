@@ -7,12 +7,14 @@ import 'phone_stage.dart';
 import 'services/api_config.dart';
 import 'services/app_services.dart';
 import 'services/crash_reports.dart';
+import 'services/push_notifications.dart';
 import 'splash_screen.dart';
 import 'startup_gate.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await startCrashReports();
+  listenInBackground(); // push notifications that are said aloud while QBOX is closed
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Color(0xFFF4F0FD),
