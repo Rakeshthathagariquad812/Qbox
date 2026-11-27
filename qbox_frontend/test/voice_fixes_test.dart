@@ -22,6 +22,7 @@ void main() {
       expect(nativeKind('రవి 500 ఉద్దెర', te), EntryKind.credit);
       expect(nativeKind('రవి 500 తీసుకున్నాడు', te), EntryKind.credit);
       expect(nativeKind('రవి 500', te), isNull);
+      expect(nativeKind('రవి 500 చెల్లించేసాడు', te), EntryKind.payment);
     });
 
     test('Hindi words decide, not the translation', () {
@@ -35,6 +36,7 @@ void main() {
       expect(nativeKind('रवि 300 उधार', hi), EntryKind.credit);
       expect(nativeKind('रवि ने 500 का सामान लिया', hi), EntryKind.credit);
       expect(nativeKind('रवि 500', hi), isNull);
+      expect(nativeKind('रवि ने 500 अदा किए', hi), EntryKind.payment);
     });
 
     const customers = [
