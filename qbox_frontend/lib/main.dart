@@ -6,11 +6,13 @@ import 'onboarding_draft.dart';
 import 'phone_stage.dart';
 import 'services/api_config.dart';
 import 'services/app_services.dart';
+import 'services/crash_reports.dart';
 import 'splash_screen.dart';
 import 'startup_gate.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await startCrashReports();
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Color(0xFFF4F0FD),

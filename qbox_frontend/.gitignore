@@ -43,3 +43,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Firebase project file (crash reports): kept on this PC only
+/android/app/google-services.json

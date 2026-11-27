@@ -1,7 +1,7 @@
 {
  "privacy": {
   "title": "Privacy Policy",
-  "updated": "25 November 2026",
+  "updated": "27 November 2026",
   "sections": [
    [
     "Who we are",
@@ -53,7 +53,8 @@
    [
     "Companies that help us",
     [
-     "Razorpay (online payments), an SMS company (codes), and the company that hosts our server. They get only what their work needs."
+     "Razorpay (online payments), an SMS company (codes), and the company that hosts our server. They get only what their work needs.",
+     "Google Firebase (crash reports): if the app crashes, a short technical report goes to us: where in the app it broke, the phone model, Android version and app version. It has no PIN, names, numbers or records."
     ]
    ],
    [

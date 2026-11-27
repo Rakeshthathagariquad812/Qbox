@@ -5,6 +5,13 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// Crash reports (Firebase Crashlytics) switch on only when the Firebase file is
+// here (downloaded from the Firebase console); without it the app builds as before.
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
+    apply(plugin = "com.google.firebase.crashlytics")
+}
+
 android {
     namespace = "in.quadrant.qbox.qbox_app"
     compileSdk = flutter.compileSdkVersion
